@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 import os
 import time
+from typing import Optional
 
 from .redis_client import get_redis
 from .service import (
@@ -20,8 +21,8 @@ def get_service() -> RateLimiterService:
 
 def resolve_identity(
     request: Request,
-    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
-    x_user_id: str | None = Header(default=None, alias="X-User-Id"),
+    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+    x_user_id: Optional[str] = Header(default=None, alias="X-User-Id"),
 ) -> str:
     if x_api_key:
         return x_api_key

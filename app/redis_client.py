@@ -1,8 +1,9 @@
 import os
+from typing import Optional
 
 from redis.asyncio import Redis
 
-_redis: Redis | None = None
+_redis: Optional[Redis] = None
 
 
 def get_redis() -> Redis:
