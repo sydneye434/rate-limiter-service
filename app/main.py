@@ -66,7 +66,9 @@ async def check_limit(
     headers = decision.headers
     status = 200 if decision.allowed else 429
 
-    return JSONResponse(status_code=status, content=decision.model_dump(), headers=headers)
+    return JSONResponse(
+        status_code=status, content=decision.model_dump(), headers=headers
+    )
 
 
 def rate_limit_dependency(
@@ -90,7 +92,9 @@ def rate_limit_dependency(
         if not decision.allowed:
             raise HTTPException(status_code=429, detail=decision.model_dump())
         for k, v in decision.headers.items():
-            request.state.response_headers = getattr(request.state, "response_headers", {})
+            request.state.response_headers = getattr(
+                request.state, "response_headers", {}
+            )
             request.state.response_headers[k] = v
 
         return decision
@@ -109,14 +113,18 @@ async def apply_rate_limit_headers(request: Request, call_next):
 
 @app.get("/demo/fixed")
 async def demo_fixed(
-    _=Depends(rate_limit_dependency(Algorithm.FIXED_WINDOW, limit=100, window_ms=60_000)),
+    _=Depends(
+        rate_limit_dependency(Algorithm.FIXED_WINDOW, limit=100, window_ms=60_000)
+    ),
 ):
     return {"ok": True, "algorithm": "fixed-window"}
 
 
 @app.get("/demo/sliding")
 async def demo_sliding(
-    _=Depends(rate_limit_dependency(Algorithm.SLIDING_WINDOW, limit=100, window_ms=60_000)),
+    _=Depends(
+        rate_limit_dependency(Algorithm.SLIDING_WINDOW, limit=100, window_ms=60_000)
+    ),
 ):
     return {"ok": True, "algorithm": "sliding-window"}
 
@@ -132,5 +140,3 @@ async def demo_token_bucket(
     ),
 ):
     return {"ok": True, "algorithm": "token-bucket"}
-
-

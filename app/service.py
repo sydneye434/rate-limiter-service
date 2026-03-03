@@ -149,7 +149,7 @@ class RateLimiterService:
 
         pipe = self.redis.pipeline()
         pipe.mget(tokens_key, ts_key)
-        (tokens_str, ts_str), = await pipe.execute()
+        ((tokens_str, ts_str),) = await pipe.execute()
 
         tokens = float(tokens_str) if tokens_str is not None else float(capacity)
         last_ts = int(ts_str) if ts_str is not None else now
@@ -204,7 +204,9 @@ class RateLimiterService:
         reset_ms: int,
         algorithm: Algorithm,
     ) -> Dict[str, str]:
-        retry_after_sec = int((retry_after_ms + 999) / 1000) if retry_after_ms > 0 else 0
+        retry_after_sec = (
+            int((retry_after_ms + 999) / 1000) if retry_after_ms > 0 else 0
+        )
         reset_sec = int((reset_ms + 999) / 1000) if reset_ms > 0 else 0
 
         headers: Dict[str, str] = {
@@ -216,5 +218,3 @@ class RateLimiterService:
         if retry_after_sec > 0:
             headers["Retry-After"] = str(retry_after_sec)
         return headers
-
-

@@ -11,5 +11,3 @@ def get_redis() -> Redis:
         url = os.getenv("REDIS_URL", "redis://localhost:6379")
         _redis = Redis.from_url(url, decode_responses=True)
     return _redis
-
-
