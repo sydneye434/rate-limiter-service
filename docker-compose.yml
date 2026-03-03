@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: rate-limiter-redis
+    ports:
+      - "6379:6379"
+  rate-limiter-1:
+    build: .
+    container_name: rate-limiter-1
+    environment:
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    ports:
+      - "8000:8000"
+  rate-limiter-2:
+    build: .
+    container_name: rate-limiter-2
+    environment:
+      - PORT=8001
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    ports:
+      - "8001:8000"
+
+
