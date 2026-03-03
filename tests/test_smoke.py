@@ -94,7 +94,9 @@ def test_fixed_window_allows_then_blocks():
     service = make_service(limit=2, window_ms=60_000)
 
     async def run():
-        params = CheckParams(identity="user1", resource="/demo", algorithm=Algorithm.FIXED_WINDOW)
+        params = CheckParams(
+            identity="user1", resource="/demo", algorithm=Algorithm.FIXED_WINDOW
+        )
         first = await service.check(params)
         second = await service.check(params)
         third = await service.check(params)
@@ -111,7 +113,9 @@ def test_sliding_window_counts_requests():
     service = make_service(limit=2, window_ms=60_000)
 
     async def run():
-        params = CheckParams(identity="user2", resource="/demo", algorithm=Algorithm.SLIDING_WINDOW)
+        params = CheckParams(
+            identity="user2", resource="/demo", algorithm=Algorithm.SLIDING_WINDOW
+        )
         first = await service.check(params)
         second = await service.check(params)
         third = await service.check(params)
