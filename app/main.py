@@ -1,3 +1,11 @@
+"""
+Rate Limiter Service – FastAPI application entrypoint.
+
+Exposes health check, RLaaS /check-limit endpoint, and demo routes with
+rate limiting. Identity is resolved from X-API-Key, X-User-Id, or client IP.
+
+Developed by Sydney Edwards.
+"""
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 import os
@@ -15,6 +23,7 @@ app = FastAPI(title="Rate Limiter Service", version="1.0.0")
 
 
 def get_service() -> RateLimiterService:
+    """Build and return the rate limiter service using the shared Redis client."""
     redis = get_redis()
     return RateLimiterService(redis)
 
@@ -24,6 +33,7 @@ def resolve_identity(
     x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
     x_user_id: Optional[str] = Header(default=None, alias="X-User-Id"),
 ) -> str:
+    """Resolve rate-limit identity: API key > user ID > client IP."""
     if x_api_key:
         return x_api_key
     if x_user_id:
@@ -33,6 +43,7 @@ def resolve_identity(
 
 @app.get("/healthz")
 async def healthz():
+    """Liveness/readiness probe; returns status and current time."""
     return {"status": "ok", "time": int(time.time())}
 
 
@@ -43,6 +54,12 @@ async def check_limit(
     service: RateLimiterService = Depends(get_service),
     identity: str = Depends(resolve_identity),
 ):
+    """
+    RLaaS endpoint: check if the request is within rate limit.
+
+    Body may include algorithm, limit, windowMs, tokensPerInterval, resource, key.
+    Returns 200 with decision + headers if allowed, 429 if limited.
+    """
     algo_str = payload.get("algorithm") or "fixed-window"
     try:
         algorithm = Algorithm(algo_str)
@@ -77,6 +94,11 @@ def rate_limit_dependency(
     limit: int,
     window_ms: int,
 ):
+    """
+    FastAPI dependency that runs the rate limiter and raises 429 if over limit.
+    Attaches rate limit headers to request.state for the middleware to add to the response.
+    """
+
     async def dependency(
         request: Request,
         service: RateLimiterService = Depends(get_service),
@@ -105,6 +127,7 @@ def rate_limit_dependency(
 
 @app.middleware("http")
 async def apply_rate_limit_headers(request: Request, call_next):
+    """Copy rate limit headers from request.state onto the response (set by rate_limit_dependency)."""
     response = await call_next(request)
     extra_headers = getattr(request.state, "response_headers", {})
     for k, v in extra_headers.items():
@@ -112,6 +135,7 @@ async def apply_rate_limit_headers(request: Request, call_next):
     return response
 
 
+# Demo routes: each uses a different algorithm with fixed limit/window
 @app.get("/demo/fixed")
 async def demo_fixed(
     _=Depends(

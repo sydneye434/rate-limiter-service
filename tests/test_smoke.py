@@ -1,3 +1,12 @@
+"""
+Unit and API tests for the rate limiter service.
+
+Uses an in-memory FakeRedis/FakePipeline to test all three algorithms
+without a real Redis. Also tests the FastAPI /healthz and /check-limit
+endpoints with dependency overrides.
+
+Developed by Sydney Edwards.
+"""
 import asyncio
 from unittest.mock import patch
 
@@ -7,7 +16,10 @@ from app import main
 from app.service import Algorithm, CheckParams, RateLimiterService
 
 
+# --- In-memory Redis stand-in for tests (no network) ---
 class FakePipeline:
+    """Mimics redis.pipeline(): chains commands and returns results on execute()."""
+
     def __init__(self, redis):
         self.redis = redis
         self.results = []
@@ -68,6 +80,8 @@ class FakePipeline:
 
 
 class FakeRedis:
+    """In-memory Redis stand-in: kv dict, zsets for sorted sets, expiries (unused in tests)."""
+
     def __init__(self):
         self.kv = {}
         self.zsets = {}
@@ -78,6 +92,7 @@ class FakeRedis:
 
 
 def make_service(limit=5, window_ms=1000):
+    """Build RateLimiterService backed by FakeRedis for tests."""
     fake = FakeRedis()
     return RateLimiterService(fake, default_limit=limit, default_window_ms=window_ms)
 

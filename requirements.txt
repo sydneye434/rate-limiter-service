@@ -1,3 +1,4 @@
+# Rate limiter service dependencies. Developed by Sydney Edwards.
 fastapi==0.115.5
 uvicorn[standard]==0.32.1
 redis[hiredis]==5.2.0

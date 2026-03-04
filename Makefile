@@ -1,3 +1,4 @@
+# Rate limiter service – format/lint targets. Developed by Sydney Edwards.
 format:
 	python3 -m black app tests
 

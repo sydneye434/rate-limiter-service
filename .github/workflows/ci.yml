@@ -1,3 +1,4 @@
+# CI: format check, tests, coverage, Trivy scan. Developed by Sydney Edwards.
 name: CI
 
 on:

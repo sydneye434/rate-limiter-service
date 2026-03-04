@@ -1,5 +1,7 @@
 # Rate Limiter Service
 
+**Developed by Sydney Edwards.**
+
 A production-style rate limiting service built with **FastAPI** and **Redis**. It supports multiple algorithms (fixed window, sliding window, token bucket), runs across distributed app instances via a shared Redis backend, and exposes a **Rate Limit as a Service (RLaaS)** API that any backend can call.
 
 ## Features
@@ -237,6 +239,10 @@ rate-limiter-service/
 ├── pyproject.toml      # Black config
 └── README.md
 ```
+
+## Author
+
+Developed by Sydney Edwards.
 
 ## License
 

@@ -1,3 +1,4 @@
+# Rate limiter service – production image. Developed by Sydney Edwards.
 FROM python:3.12-alpine3.20
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

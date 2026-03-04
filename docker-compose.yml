@@ -1,3 +1,4 @@
+# Rate limiter service: Redis + two app instances. Developed by Sydney Edwards.
 version: "3.9"
 
 services:
