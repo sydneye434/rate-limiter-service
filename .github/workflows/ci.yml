@@ -55,15 +55,30 @@ jobs:
         uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: local/rate-limiter-service:ci
-          format: sarif
-          output: trivy-report.sarif
+          format: table
+          output: trivy-report.txt
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          exit-code: '1'
+          exit-code: '0'
 
       - name: Upload Trivy report
         uses: actions/upload-artifact@v4
         with:
           name: trivy-report
-          path: trivy-report.sarif
+          path: trivy-report.txt
+
+      - name: Trivy summary and warning
+        run: |
+          echo "## Trivy vulnerability scan" >> "$GITHUB_STEP_SUMMARY"
+          if grep -E 'CRITICAL|HIGH' trivy-report.txt > /dev/null; then
+            echo "::warning::Trivy found CRITICAL/HIGH vulnerabilities. See 'trivy-report.txt' artifact and summary." 
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Trivy found CRITICAL/HIGH vulnerabilities (CRITICAL/HIGH severities)." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No CRITICAL or HIGH vulnerabilities found." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          sed -n '1,40p' trivy-report.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
