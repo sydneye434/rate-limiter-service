@@ -188,6 +188,19 @@ With venv:
 venv/bin/pytest --cov=app --cov-report=term-missing --cov-fail-under=85
 ```
 
+### Pre-commit hook
+
+A git hook runs Black before each commit so `app/` and `tests/` stay formatted. It uses `.venv`: activate it, then run Black.
+
+**One-time setup** (from the repo root):
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+```
+
+Ensure `.venv` exists and has Black installed (`pip install black`). On each commit, the hook runs `source .venv/bin/activate` then `python3 -m black app tests`; if Black fails or changes files, fix and re-add before committing.
+
 ## Scaling
 
 ### Horizontal scaling (app tier)
@@ -227,6 +240,8 @@ If Redis is down or unreachable, the service cannot apply limits reliably; consi
 
 ```
 rate-limiter-service/
+├── .githooks/
+│   └── pre-commit      # Runs Black (via .venv) before commit
 ├── app/
 │   ├── main.py          # FastAPI app, routes, middleware
 │   ├── redis_client.py  # Redis connection
