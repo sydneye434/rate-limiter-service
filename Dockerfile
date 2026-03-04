@@ -1,16 +1,23 @@
-FROM python:3.12-slim
+FROM python:3.12-alpine3.20
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/home/appuser/.local/bin:${PATH}"
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
+# Create unprivileged user
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Keep image minimal: no OS build toolchain, install wheels only where possible
+RUN python -m pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+USER appuser
 
 EXPOSE 8000
 
