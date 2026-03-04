@@ -6,6 +6,7 @@ rate limiting. Identity is resolved from X-API-Key, X-User-Id, or client IP.
 
 Developed by Sydney Edwards.
 """
+
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 import os

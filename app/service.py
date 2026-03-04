@@ -7,6 +7,7 @@ in Redis so limits are consistent across distributed app instances.
 
 Developed by Sydney Edwards.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,6 +21,7 @@ import time
 
 class Algorithm(str, Enum):
     """Supported rate limit algorithm names (for API and config)."""
+
     FIXED_WINDOW = "fixed-window"
     SLIDING_WINDOW = "sliding-window"
     TOKEN_BUCKET = "token-bucket"
@@ -28,6 +30,7 @@ class Algorithm(str, Enum):
 @dataclass
 class CheckParams:
     """Input to a single rate limit check (identity, scope, algorithm, limits)."""
+
     identity: str
     resource: Optional[str] = None
     algorithm: Algorithm = Algorithm.FIXED_WINDOW
@@ -38,6 +41,7 @@ class CheckParams:
 
 class RateLimitDecision(BaseModel):
     """Result of a rate limit check: allowed/denied, counts, and HTTP headers to return."""
+
     allowed: bool
     remaining: int
     limit: int

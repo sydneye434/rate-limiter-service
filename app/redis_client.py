@@ -7,6 +7,7 @@ so we work with string values.
 
 Developed by Sydney Edwards.
 """
+
 import os
 from typing import Optional
 
